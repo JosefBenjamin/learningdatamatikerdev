@@ -1,0 +1,55 @@
+# Set userToken/adminToken via ManualSecurityTest before running these calls
+
+### Populate guides and trips
+GET {{url}}/trips/populate
+
+### Get all trips (requires USER or ADMIN)
+GET {{url}}/trips
+Authorization: Bearer {{userToken}}
+
+### Get trips filtered by category (e.g., beach)
+GET {{url}}/trips?category=beach
+Authorization: Bearer {{userToken}}
+
+### Get a trip by id (includes guide + packing list)
+GET {{url}}/trips/1
+Authorization: Bearer {{userToken}}
+
+### Create a new trip
+POST {{url}}/trips
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "startTime": "2024-08-01",
+  "endTime": "2024-08-05",
+  "locationCoordinates": 55.67,
+  "category": "CITY",
+  "price": 2500
+}
+
+### Update an existing trip
+PUT {{url}}/trips/1
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "tripId": 1,
+  "startTime": "2024-08-02",
+  "endTime": "2024-08-06",
+  "locationCoordinates": 57.00,
+  "category": "CITY",
+  "tripPrice": 2700
+}
+
+### Delete a trip
+DELETE {{url}}/trips/1
+Authorization: Bearer {{userToken}}
+
+### Link guide to trip (use ADMIN token if you prefer)
+PUT {{url}}/trips/4/guides/2
+Authorization: Bearer {{adminToken}}
+
+### Get guide totals
+GET {{url}}/trips/guides/totalprice
+Authorization: Bearer {{userToken}}

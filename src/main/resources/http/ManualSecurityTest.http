@@ -1,0 +1,71 @@
+### Populate default users (optional helper)
+GET {{url}}/auth/populate_users
+
+### login_user
+# Use the seeded Consumer account
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "Consumer",
+  "password": "password123"
+}
+
+> {% client.global.set("userToken", response.body.token); %}
+
+### login_admin
+# Use the seeded admin account
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "adminpass123"
+}
+
+> {% client.global.set("adminToken", response.body.token); %}
+
+### Access USER protected endpoint with user token
+GET {{url}}/protected/user_demo
+Authorization: Bearer {{userToken}}
+
+### Access ADMIN protected endpoint with user token (should fail 401)
+GET {{url}}/protected/admin_demo
+Authorization: Bearer {{userToken}}
+
+### Access ADMIN protected endpoint with admin token
+GET {{url}}/protected/admin_demo
+Authorization: Bearer {{adminToken}}
+
+### Try to add a role with user token (should fail 401)
+POST {{url}}/auth/user/addrole
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+  "role": "MANAGER"
+}
+
+### Add a role with admin token (succeeds)
+POST {{url}}/auth/user/addrole
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "role": "MANAGER"
+}
+
+### Register a brand new user (optional)
+POST {{url}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "systest",
+  "password": "password123"
+}
+
+### Healthcheck (public)
+GET {{url}}/auth/healthcheck
+
+### Test unauthorized access (no token)
+GET {{url}}/protected/user_demo

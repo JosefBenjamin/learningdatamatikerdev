@@ -1,0 +1,56 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+Trip <-- Category
+Trip <-- Guide
+ApiUser <-- Role
+
+
+class Trip {
+- Long id;
+- Instant startTime;
+- Instant endTime;
+- float locationCoordinates;
+- float price;
+- Category category;
+- Guide guide;
+}
+
+class Guide {
+- Long id;
+- String name;
+- String email;
+- int phone;
+- int yoe;
+- Set<Trip> trips
+}
+
+class ApiUser {
+- String username;
+- String password;
+- Role role;
+}
+
+class Role {
+- String name;
+- Set<ApiUser> apiUsers;
+}
+
+enum EnumRole implements RouteRole {
+ANYONE,
+API_USER,
+ADMIN
+}
+
+
+enum Category {
+BEACH,
+CITY,
+FOREST,
+LAKE,
+SEA,
+SNOW
+}
+
+@enduml
