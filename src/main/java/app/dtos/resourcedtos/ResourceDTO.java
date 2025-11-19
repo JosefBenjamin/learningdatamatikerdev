@@ -1,16 +1,15 @@
 package app.dtos.resourcedtos;
 
-import app.dtos.contributordtos.SimpleContributorDTO;
 import app.enums.FormatCategory;
 import app.enums.SubCategory;
 
-public record SimpleResourceDTO(
+public record ResourceDTO(
         Integer learningId,
         String learningResourceLink,
         String title,
         FormatCategory formatCategory,
         SubCategory subCategory,
-        String description,
-        SimpleContributorDTO simpleContributorDTO
+        String description
+
 ) {
 }

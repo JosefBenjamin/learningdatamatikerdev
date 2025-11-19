@@ -23,21 +23,12 @@ public class SecurityRoutes {
         return () -> {
             path("/auth", () -> {
                 get("/healthcheck", ctx -> securityController.healthCheck(ctx), Role.ANYONE);
-                get("/populate_users", ctx -> securityController.populateUsers(ctx), Role.ANYONE);
-                get("/test", ctx -> ctx.json(jsonMapper.createObjectNode().put("msg", "Hello from Open Deployment")), Role.ANYONE);
+                get("/populate", ctx -> securityController.populateUsers(ctx), Role.ANYONE);
                 post("/login", securityController.login(), Role.ANYONE);
                 post("/register", securityController.register(), Role.ANYONE);
-                post("/user/addrole", securityController.addRole(), Role.ADMIN); //Change to Role.ADMIN
             });
         };
     }
 
-    public static EndpointGroup getSecuredRoutes() {
-        return () -> {
-            path("/protected", () -> {
-                get("/user_demo", (ctx) -> ctx.json(jsonMapper.createObjectNode().put("msg", "Hello from USER Protected")), Role.USER);
-                get("/admin_demo", (ctx) -> ctx.json(jsonMapper.createObjectNode().put("msg", "Hello from ADMIN Protected")), Role.ADMIN);
-            });
-        };
-    }
+
 }

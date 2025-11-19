@@ -1,7 +1,6 @@
 package app.security.services;
 
 import app.configs.HibernateConfig;
-import app.populators.UserPopulator;
 import app.security.daos.SecurityDAO;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -15,6 +14,7 @@ public class SecurityService {
     }
 
     public void populateUsers(){
+
     }
 
 

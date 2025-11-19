@@ -3,15 +3,19 @@ package app.configs;
 import app.controllers.ExceptionController;
 import app.exceptions.ApiException;
 import app.exceptions.DatabaseException;
+import app.routes.ContributorRoutes;
 import app.routes.ResourceRoutes;
 import app.security.controllers.AccessController;
 import app.security.controllers.SecurityController;
 import app.security.enums.Role;
+import app.security.routes.AdminRoutes;
 import app.security.routes.SecurityRoutes;
 import app.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NoResultException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class JavalinConfig {
 
     private static ResourceRoutes resourceRoutes = new ResourceRoutes();
+    private static ContributorRoutes contributorRoutes = new ContributorRoutes();
     private static ObjectMapper jsonMapper = new Utils().getObjectMapper();
     private static SecurityController securityController = SecurityController.getInstance();
     private static AccessController accessController = new AccessController();
@@ -31,7 +36,8 @@ public class JavalinConfig {
         config.bundledPlugins.enableRouteOverview("/routes", Role.ANYONE);
         config.router.contextPath = "/api/learn_v1"; // base path for all endpoints
         config.router.apiBuilder(resourceRoutes.getResourceRoutes());
-        config.router.apiBuilder(SecurityRoutes.getSecuredRoutes());
+        config.router.apiBuilder(contributorRoutes.getContributorRoutes());
+        config.router.apiBuilder(AdminRoutes.getSecuredRoutes());
         config.router.apiBuilder(SecurityRoutes.getSecurityRoutes());
     }
 
@@ -73,13 +79,21 @@ public class JavalinConfig {
         app.beforeMatched(accessController::accessHandler);
         app.after(JavalinConfig::afterRequest);
 
+        //Global exception handlers
         ExceptionController exceptionController = new ExceptionController();
         app.exception(ApiException.class, exceptionController::apiExceptionHandler);
         app.exception(DatabaseException.class, exceptionController::databaseExceptionHandler);
+        app.exception(IllegalArgumentException.class, exceptionController::illegalArgumentExceptionHandler);
+        app.exception(EntityNotFoundException.class, exceptionController::entityNotFoundExceptionHandler);
+        app.exception(NoResultException.class, exceptionController::noResultExceptionHandler);
+        app.exception(RuntimeException.class, exceptionController::runtimeExceptionHandler);
+
         app.start(port);
         return app;
     }
 
+    //After a client request (fail or not) logs;  request method, URI, http status code,
+    //Also a counter starting from 1 in the log file
     public static void afterRequest(Context ctx) {
         String requestInfo = ctx.req().getMethod() + " " + ctx.req().getRequestURI();
         logger.info(" Request {} - {} was handled with status code {}", count++, requestInfo, ctx.status());

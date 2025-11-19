@@ -21,9 +21,13 @@ public class Resource {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(name = "learning_id", nullable = false ,unique = true)
     private Integer learningId;
 
+    @EqualsAndHashCode.Include
     private String learningResourceLink;
+
+    private String title;
 
     @Enumerated(EnumType.STRING)
     private FormatCategory formatCategory;

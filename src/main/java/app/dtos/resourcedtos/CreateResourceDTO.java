@@ -4,8 +4,7 @@ import app.dtos.contributordtos.SimpleContributorDTO;
 import app.enums.FormatCategory;
 import app.enums.SubCategory;
 
-public record SimpleResourceDTO(
-        Integer learningId,
+public record CreateResourceDTO(
         String learningResourceLink,
         String title,
         FormatCategory formatCategory,

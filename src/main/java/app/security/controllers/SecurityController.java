@@ -2,7 +2,6 @@ package app.security.controllers;
 
 import app.configs.HibernateConfig;
 import app.exceptions.ApiException;
-import app.security.daos.ISecurityDAO;
 import app.security.daos.SecurityDAO;
 import app.security.dtos.SignupRequestDTO;
 import app.security.entities.User;
@@ -90,10 +89,11 @@ public class SecurityController implements IAuthenticationController {
         if (signup.password() == null || signup.password().isBlank()) {
             throw new ValidationException("Password is required");
         }
+        //if GitHub handle is null or empty AND screenname is empty or null, one must be filled out
         boolean missingProfile = (signup.githubProfile() == null || signup.githubProfile().isBlank()) &&
                 (signup.screenName() == null || signup.screenName().isBlank());
         if (missingProfile) {
-            throw new ValidationException("Provide either githubProfile or screenName");
+            throw new ValidationException("Provide either GitHub profile handle or a unique screen name");
         }
     }
 

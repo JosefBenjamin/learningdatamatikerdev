@@ -7,7 +7,6 @@ import app.security.dtos.SignupRequestDTO;
 import app.security.entities.Role;
 import app.security.entities.User;
 import app.security.exceptions.ValidationException;
-import app.security.hashing.PasswordHasher;
 import dk.bugelhartmann.UserDTO;
 import jakarta.persistence.*;
 
@@ -57,6 +56,9 @@ public class SecurityDAO implements ISecurityDAO {
         }
     }
 
+    /**
+     * LEGACY method
+     *
     @Override
     public User createUser(String username, String password) {
         try (EntityManager em = getEntityManager()) {
@@ -78,11 +80,34 @@ public class SecurityDAO implements ISecurityDAO {
             throw new ApiException(400, e.getMessage());
         }
     }
+    */
 
     public User createUserWithContributor(SignupRequestDTO dto) {
         try (EntityManager em = getEntityManager()) {
             if (em.find(User.class, dto.username()) != null) {
                 throw new EntityExistsException("User with username: " + dto.username() + " already exists");
+            }
+
+            //either these have a value or are null
+            String github = blankToNull(dto.githubProfile());
+            String screenName = blankToNull(dto.screenName());
+
+            //if one of these isn't null the try block is executed
+            if (github != null || screenName != null) {
+                try {
+                    em.createQuery(
+                                    "SELECT c FROM Contributor c " +
+                                            "WHERE (:github IS NOT NULL AND LOWER(c.githubProfile) = LOWER(:github)) " +
+                                            "OR (:screen IS NOT NULL AND LOWER(c.screenName) = LOWER(:screen))",
+                                    Contributor.class)
+                            .setParameter("github", github)
+                            .setParameter("screen", screenName)
+                            .getSingleResult();
+
+                    throw new EntityExistsException("GitHub handle or screen name already exists");
+                } catch (NoResultException ignored) {
+                    // No duplicates found, continue
+                }
             }
 
             EntityTransaction tx = em.getTransaction();
@@ -92,13 +117,13 @@ public class SecurityDAO implements ISecurityDAO {
                 User user = new User(dto.username(), dto.password());
 
                 Contributor contributor = Contributor.builder()
-                        .githubProfile(blankToNull(dto.githubProfile()))
-                        .screenName(blankToNull(dto.screenName()))
+                        .githubProfile(github)
+                        .screenName(screenName)
                         .contributions(0)
                         .build();
                 contributor.attachUser(user);                     // keeps both sides in sync
 
-                Role userRole = ensureRole(em, "USER");      // reuse same role for everyone
+                Role userRole = ensureRole(em, "user");      // reuse same role for everyone
                 user.addRole(userRole);
 
                 em.persist(user);                                  // persist both sides (contributor owns the FK)
@@ -110,7 +135,7 @@ public class SecurityDAO implements ISecurityDAO {
                 if (tx.isActive()) {
                     tx.rollback();
                 }
-                throw e;
+                throw new ApiException(500, "Could not create a user");
             }
         }
     }
@@ -150,4 +175,3 @@ public class SecurityDAO implements ISecurityDAO {
         }
     }
 }
-
