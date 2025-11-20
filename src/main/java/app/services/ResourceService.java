@@ -103,7 +103,7 @@ public class ResourceService {
 
         Resource resource = RESOURCE_DAO.findByLearningId(simpleResourceDTO.learningId());
         if(RESOURCE_DAO.findById(resource.getId()) == null){
-            throw new ApiException("Couldn't find the learning resource in our database");
+            throw new ApiException(404, "Couldn't find the learning resource in our database");
         }
 
         //Null checks
@@ -145,21 +145,22 @@ public class ResourceService {
     //DELETE
 
     //TODO: DELETE resources/{learning_id}
-    public boolean deleteResource(LearningIdDTO learningIdDTO, Long authenticatedContributorId){
+    public boolean deleteResource(LearningIdDTO learningIdDTO, boolean isAdmin, Long authenticatedContributorId){
         if(learningIdDTO.learningId() == null){
-            throw new IllegalArgumentException("You must enter a valid ID");
+            throw new IllegalArgumentException("You must enter a valid learning id");
         }
 
-        if (authenticatedContributorId == null) {
-            throw new ApiException(403, "You must have a contributor profile to create resources");
+        if (!isAdmin && authenticatedContributorId == null) {
+            throw new ApiException(403, "You must have a contributor profile to delete a resource");
         }
 
         Resource resource = RESOURCE_DAO.findByLearningId(learningIdDTO.learningId());
         if(resource == null || resource.getLearningId() == null){
-            throw new IllegalArgumentException("Learning id must be provided in order to update learning resource");
+            throw new IllegalArgumentException("There is no resource with this learning id");
         }
 
-        if (!resource.getContributor().getId().equals(authenticatedContributorId)) {
+        //if isAdmin is false and id is not authenticated, this block runs
+        if (!isAdmin &&!resource.getContributor().getId().equals(authenticatedContributorId)) {
             throw new ApiException(403, "You are not allowed to delete this resource");
         }
 

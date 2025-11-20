@@ -99,11 +99,10 @@ public class ContributorController {
 
 
         //3) Call the server method
-        contributorService.deleteContributor(contributorNameDTO,
-                authenticatedContributorId, isAdmin);
+        boolean result = contributorService.deleteContributor(contributorNameDTO, authenticatedContributorId, isAdmin);
 
         //4) Respond with 200 success
-        ctx.status(200).json(Map.of("Your contributor account was deleted: ", isAdmin));
+        ctx.status(200).json(Map.of("Your contributor account was deleted: ", result));
     }
 
 
