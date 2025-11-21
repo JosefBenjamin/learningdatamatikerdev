@@ -23,7 +23,6 @@ public class SecurityRoutes {
         return () -> {
             path("/auth", () -> {
                 get("/healthcheck", ctx -> securityController.healthCheck(ctx), Role.ANYONE);
-                get("/populate", ctx -> securityController.populateUsers(ctx), Role.ANYONE);
                 post("/login", securityController.login(), Role.ANYONE);
                 post("/register", securityController.register(), Role.ANYONE);
             });

@@ -7,7 +7,6 @@ import app.security.dtos.SignupRequestDTO;
 import app.security.entities.User;
 import app.security.exceptions.NotAuthorizedException;
 import app.security.exceptions.ValidationException;
-import app.security.services.SecurityService;
 import app.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -41,7 +40,6 @@ public class SecurityController implements IAuthenticationController {
     ITokenSecurity tokenSecurity = new TokenSecurity();
     private static SecurityDAO securityDAO;
     private static SecurityController instance;
-    private SecurityService securityService = new SecurityService();
     private static Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
     private SecurityController() { }
@@ -73,13 +71,6 @@ public class SecurityController implements IAuthenticationController {
                 ctx.json(returnObject.put("msg", e.getMessage()));
             }
         };
-    }
-
-    public void populateUsers(Context ctx){
-        securityService.populateUsers();
-
-        //Response
-        ctx.status(201).json(Map.of("message", "Users with admin has been populated"));
     }
 
     private void validateSignup(SignupRequestDTO signup) {

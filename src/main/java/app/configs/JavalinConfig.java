@@ -34,7 +34,7 @@ public class JavalinConfig {
 
     public static void configuration(io.javalin.config.JavalinConfig config) {
         config.showJavalinBanner = false;
-        //TODO: api/tp_v1/routes Javalin shows a page with every route available
+        //TODO: api/learn_v1/routes Javalin shows a page with every route available
         config.bundledPlugins.enableRouteOverview("/routes", Role.ANYONE);
         config.router.contextPath = "/api/learn_v1"; // base path for all endpoints
         config.router.apiBuilder(resourceRoutes.getResourceRoutes());
