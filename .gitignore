@@ -41,4 +41,6 @@ build/
 /.idea
 /src/main/resources/http/http-client.secret.env.json
 
+### Logs ###
+logs/
 

@@ -24,6 +24,8 @@ public class JavalinConfig {
 
     private static ResourceRoutes resourceRoutes = new ResourceRoutes();
     private static ContributorRoutes contributorRoutes = new ContributorRoutes();
+    private static AdminRoutes adminRoutes = new AdminRoutes();
+    private static SecurityRoutes securityRoutes = new SecurityRoutes();
     private static ObjectMapper jsonMapper = new Utils().getObjectMapper();
     private static SecurityController securityController = SecurityController.getInstance();
     private static AccessController accessController = new AccessController();
@@ -37,8 +39,8 @@ public class JavalinConfig {
         config.router.contextPath = "/api/learn_v1"; // base path for all endpoints
         config.router.apiBuilder(resourceRoutes.getResourceRoutes());
         config.router.apiBuilder(contributorRoutes.getContributorRoutes());
-        config.router.apiBuilder(AdminRoutes.getSecuredRoutes());
-        config.router.apiBuilder(SecurityRoutes.getSecurityRoutes());
+        config.router.apiBuilder(adminRoutes.getSecuredRoutes());
+        config.router.apiBuilder(securityRoutes.getSecurityRoutes());
     }
 
     /**

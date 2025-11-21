@@ -207,6 +207,7 @@ public class ResourceDAO implements ICRUD<Resource> {
         }
     }
 
+    //UPDATE
     @Override
     public Resource update(Resource entity) {
         if(entity == null){
@@ -227,6 +228,7 @@ public class ResourceDAO implements ICRUD<Resource> {
         }
     }
 
+    //DELETE
     @Override
     public boolean delete(Long id) {
         if(id == null){

@@ -19,7 +19,7 @@ public class SecurityRoutes {
     private static ObjectMapper jsonMapper = new Utils().getObjectMapper();
     private static SecurityController securityController = SecurityController.getInstance();
 
-    public static EndpointGroup getSecurityRoutes() {
+    public EndpointGroup getSecurityRoutes() {
         return () -> {
             path("/auth", () -> {
                 get("/healthcheck", ctx -> securityController.healthCheck(ctx), Role.ANYONE);

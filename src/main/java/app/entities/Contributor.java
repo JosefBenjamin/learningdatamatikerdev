@@ -27,7 +27,7 @@ public class Contributor {
 
     private String screenName;
 
-    private Integer contributions;
+    private Integer contributions = 0;
 
     @OneToMany(mappedBy = "contributor", fetch =FetchType.LAZY)
     @Builder.Default

@@ -1,5 +1,6 @@
 package app.dtos.resourcedtos;
 
+import app.dtos.contributordtos.ContributorNameDTO;
 import app.enums.FormatCategory;
 import app.enums.SubCategory;
 
@@ -9,7 +10,7 @@ public record ResourceDTO(
         String title,
         FormatCategory formatCategory,
         SubCategory subCategory,
-        String description
-
+        String description,
+        ContributorNameDTO contributorNameDTO
 ) {
 }

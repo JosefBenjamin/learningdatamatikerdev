@@ -1,25 +1,30 @@
 package app.services;
 
 import app.configs.HibernateConfig;
-import app.converters.ConvertToContributorDTO;
+import app.converters.ConvertToResourceDTO;
+import app.converters.ResourceToResourceDTO;
 import app.daos.ContributorDAO;
 import app.daos.ResourceDAO;
+import app.dtos.categorydtos.SingleFormatCatDTO;
+import app.dtos.categorydtos.SingleSubCategoryDTO;
+import app.dtos.contributordtos.ContributorNameDTO;
 import app.dtos.contributordtos.SimpleContributorDTO;
-import app.dtos.resourcedtos.LearningIdDTO;
-import app.dtos.resourcedtos.SimpleResourceDTO;
+import app.dtos.resourcedtos.*;
 import app.entities.Contributor;
 import app.entities.Resource;
 import app.exceptions.ApiException;
-import app.security.daos.SecurityDAO;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResourceService {
     private final EntityManagerFactory EMF = HibernateConfig.getEntityManagerFactory();
     private final ContributorDAO CONTRIBUTOR_DAO = ContributorDAO.getInstance(EMF);
     private final ResourceDAO RESOURCE_DAO = ResourceDAO.getInstance(EMF);
-    private final SecurityDAO SECURITY_DAO = SecurityDAO.getInstance(EMF);
-    private final ConvertToContributorDTO convertToContributeDTO = new ConvertToContributorDTO();
+    private final ConvertToResourceDTO convertToResourceDTO = new ConvertToResourceDTO();
+    private final ResourceToResourceDTO resourceToResourceDTO = new ResourceToResourceDTO();
 
 
     public ResourceService(){
@@ -58,6 +63,8 @@ public class ResourceService {
             throw new EntityNotFoundException("No contributor found with id " + authenticatedContributorId);
         }
 
+        contributor.setContributions(contributor.getContributions() + 1);
+
         Resource resource = Resource.builder()
                 .learningResourceLink(simpleResourceDTO.learningResourceLink().trim())
                 .title(simpleResourceDTO.title().trim())
@@ -68,6 +75,8 @@ public class ResourceService {
                 .build();
 
         Resource persisted = RESOURCE_DAO.persist(resource);
+        CONTRIBUTOR_DAO.update(contributor);
+
         SimpleContributorDTO contributorDTO = new SimpleContributorDTO(
                 contributor.getId(),
                 contributor.getGithubProfile(),
@@ -87,6 +96,115 @@ public class ResourceService {
 
     //READ
 
+    //TODO: GET resources/{id}
+    public SimpleResourceDTO findResourceById(ResourceIdDTO resourceIdDTO){
+        if(resourceIdDTO == null){
+            throw new IllegalArgumentException("You must enter a valid resource id");
+        }
+
+        Resource resource = RESOURCE_DAO.findById(resourceIdDTO.id());
+        if(resource == null){
+            throw new EntityNotFoundException("Could not find a resource with that id");
+        }
+
+        return convertToResourceDTO.convert(resource);
+    }
+
+    //TODO: GET resources/{learning_id}
+    public SimpleResourceDTO findResourceById(LearningIdDTO learningIdDTO){
+        if(learningIdDTO == null){
+            throw new IllegalArgumentException("You must enter a valid learning id");
+        }
+
+        Resource resource = RESOURCE_DAO.findByLearningId(learningIdDTO.learningId());
+        if(resource == null){
+            throw new EntityNotFoundException("Could not find a resource with that id");
+        }
+        return convertToResourceDTO.convert(resource);
+    }
+
+    //Getting all resources you must be logged in
+    //TODO: GET resources/  <-- retrieve all sort by format category
+    public List<ResourceDTO> getAllResources(Long authenticatedContributorId, boolean isAdmin){
+        if (!isAdmin && authenticatedContributorId == null) {
+            throw new RuntimeException("You must be logged in to request all resources");
+        }
+        return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.retrieveAll()));
+    }
+
+    //Getting all resources by format cat you must be logged in
+    //TODO: GET resources/{format_category}
+    public List<ResourceDTO> getAllResourcesInFormatCat(SingleFormatCatDTO singleFormatCatDTO, Long authenticatedContributorId, boolean isAdmin){
+        if (!isAdmin && authenticatedContributorId == null) {
+            throw new RuntimeException("You must be logged in to request all resources in a category");
+        }
+
+        if(singleFormatCatDTO == null || singleFormatCatDTO.formatCategory() == null){
+            return getAllResources(authenticatedContributorId, isAdmin);
+        }
+
+        return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.findByFormatCat(singleFormatCatDTO.formatCategory())));
+    }
+
+    //Getting all resources by sub cat you must be logged in
+    //TODO: GET resources/{sub_category}
+    public List<ResourceDTO> getAllResourcesInSubCat(SingleSubCategoryDTO singleSubCategoryDTO, Long authenticatedContributorId, boolean isAdmin){
+        if (!isAdmin && authenticatedContributorId == null) {
+            throw new RuntimeException("You must be logged in to request all resources in a category");
+        }
+
+        if(singleSubCategoryDTO == null || singleSubCategoryDTO.subCategory() == null){
+            return getAllResources(authenticatedContributorId, isAdmin);
+        }
+
+        return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.findBySubCat(singleSubCategoryDTO.subCategory())));
+    }
+
+
+    //TODO: GET resources/{title}
+    public SimpleResourceDTO findByTitle(ResourceTitleDTO resourceTitleDTO){
+        if(resourceTitleDTO == null){
+            throw new IllegalArgumentException("You must enter a valid title");
+        }
+
+        Resource resource = RESOURCE_DAO.findByTitle(resourceTitleDTO.title());
+        if(resource == null){
+            throw new EntityNotFoundException("Could not find a resource with that title");
+        }
+        return convertToResourceDTO.convert(resource);
+    }
+
+    //TODO: GET resources/{contributor}
+    public List<SimpleResourceDTO> findByContributor(ContributorNameDTO contributorNameDTO){
+        if(contributorNameDTO == null){
+            throw new IllegalArgumentException("You must enter a valid GitHub or screen name");
+        }
+
+        Contributor contributor = CONTRIBUTOR_DAO.findByName(contributorNameDTO.name());
+        if(contributor == null){
+            throw new EntityNotFoundException("Could not find a contributor with Github or scree name");
+        }
+
+        List<Resource> resourceList = new ArrayList<>(RESOURCE_DAO.findByContributor(contributor.getId()));
+        if(resourceList == null){
+            throw  new EntityNotFoundException("Could not find a list of resources from that contributor");
+        }
+
+        return convertToResourceDTO.convertList(resourceList);
+    }
+
+    //TODO: GET resources/{keyword}
+    public List<SimpleResourceDTO> findByKeyword(ResourceKeywordDTO resourceKeywordDTO){
+        if(resourceKeywordDTO == null){
+            throw new IllegalArgumentException("You must enter a valid keyword");
+        }
+
+        List<Resource> resourceList = new ArrayList<>(RESOURCE_DAO.findByKeyword(resourceKeywordDTO.keyword()));
+        if(resourceList == null){
+            throw new EntityNotFoundException("Could not find any resources matching that keyword");
+        }
+        return convertToResourceDTO.convertList(resourceList);
+    }
 
 
     //UPDATE
@@ -160,10 +278,18 @@ public class ResourceService {
         }
 
         //if isAdmin is false and id is not authenticated, this block runs
-        if (!isAdmin &&!resource.getContributor().getId().equals(authenticatedContributorId)) {
+        if (!isAdmin && !resource.getContributor().getId().equals(authenticatedContributorId)) {
             throw new ApiException(403, "You are not allowed to delete this resource");
         }
 
+
+        resource.getContributor().setContributions(resource.getContributor().getContributions() - 1);
+
+        if(resource.getContributor().getContributions() < 0){
+            throw new ApiException(400, "You cannot have negative contributions, something went wrong!");
+        }
+
+        CONTRIBUTOR_DAO.update(resource.getContributor());
         return RESOURCE_DAO.delete(resource.getId());
     }
 

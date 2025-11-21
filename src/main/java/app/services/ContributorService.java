@@ -3,10 +3,8 @@ package app.services;
 import app.configs.HibernateConfig;
 import app.converters.ConvertToContributorDTO;
 import app.daos.ContributorDAO;
-import app.daos.ResourceDAO;
 import app.dtos.contributordtos.*;
 import app.entities.Contributor;
-import app.security.daos.SecurityDAO;
 import dk.bugelhartmann.UserDTO;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,8 +15,6 @@ import java.util.List;
 public class ContributorService {
     private final EntityManagerFactory EMF = HibernateConfig.getEntityManagerFactory();
     private final ContributorDAO CONTRIBUTOR_DAO = ContributorDAO.getInstance(EMF);
-    private final ResourceDAO RESOURCE_DAO = ResourceDAO.getInstance(EMF);
-    private final SecurityDAO SECURITY_DAO = SecurityDAO.getInstance(EMF);
     private final ConvertToContributorDTO convertToContributeDTO = new ConvertToContributorDTO();
 
 

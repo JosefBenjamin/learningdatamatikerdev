@@ -1,14 +1,24 @@
 package app.controllers;
 
+import app.dtos.categorydtos.SingleFormatCatDTO;
+import app.dtos.categorydtos.SingleSubCategoryDTO;
+import app.dtos.contributordtos.ContributorNameDTO;
 import app.dtos.resourcedtos.LearningIdDTO;
+import app.dtos.resourcedtos.ResourceDTO;
+import app.dtos.resourcedtos.ResourceIdDTO;
+import app.dtos.resourcedtos.ResourceKeywordDTO;
+import app.dtos.resourcedtos.ResourceTitleDTO;
 import app.dtos.resourcedtos.SimpleResourceDTO;
 import app.services.ContributorService;
 import app.services.ResourceService;
+import app.enums.FormatCategory;
+import app.enums.SubCategory;
 import dk.bugelhartmann.UserDTO;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 public class ResourceController {
@@ -37,6 +47,83 @@ public class ResourceController {
 
         // 4) Returns http status code + json body
         ctx.status(201).json(responseResource);
+    }
+
+    //TODO: GET resources/{id}
+    public void getResourceById(Context ctx){
+        Long id = Long.valueOf(ctx.pathParam("id"));
+        SimpleResourceDTO resource = resourceService.findResourceById(new ResourceIdDTO(id));
+        ctx.status(200).json(resource);
+    }
+
+    //TODO: GET resources/{learning_id}
+    public void getResourceByLearningId(Context ctx){
+        Integer learningId = Integer.valueOf(ctx.pathParam("learning_id"));
+        SimpleResourceDTO resource = resourceService.findResourceById(new LearningIdDTO(learningId));
+        ctx.status(200).json(resource);
+    }
+
+    //TODO: GET resources/  <-- retrieve all sort by format category
+    public void getAllResources(Context ctx){
+        UserDTO user = ctx.attribute("user");
+        boolean isAdmin = user != null && user.getRoles().contains("ADMIN");
+        Long contributorId = contributorService.getContributorIdForUser(user);
+
+        List<ResourceDTO> response = resourceService.getAllResources(contributorId, isAdmin);
+        ctx.status(200).json(response);
+    }
+
+    //TODO: GET resources/{format_category}
+    public void getResourcesByFormatCategory(Context ctx){
+        String formatCat = ctx.pathParam("format_category");
+        FormatCategory formatCategory = FormatCategory.valueOf(formatCat.toUpperCase());
+
+        UserDTO user = ctx.attribute("user");
+        boolean isAdmin = user != null && user.getRoles().contains("ADMIN");
+        Long contributorId = contributorService.getContributorIdForUser(user);
+
+        List<ResourceDTO> response = resourceService.getAllResourcesInFormatCat(
+                new SingleFormatCatDTO(formatCategory),
+                contributorId,
+                isAdmin);
+        ctx.status(200).json(response);
+    }
+
+    //TODO: GET resource/{sub_category}
+    public void getResourcesBySubCategory(Context ctx){
+        String subCat = ctx.pathParam("sub_category");
+        SubCategory subCategory = SubCategory.valueOf(subCat.toUpperCase());
+
+        UserDTO user = ctx.attribute("user");
+        boolean isAdmin = user != null && user.getRoles().contains("ADMIN");
+        Long contributorId = contributorService.getContributorIdForUser(user);
+
+        List<ResourceDTO> response = resourceService.getAllResourcesInSubCat(
+                new SingleSubCategoryDTO(subCategory),
+                contributorId,
+                isAdmin);
+        ctx.status(200).json(response);
+    }
+
+    //TODO: GET resource/{title}
+    public void getResourceByTitle(Context ctx){
+        String title = ctx.pathParam("title");
+        SimpleResourceDTO resource = resourceService.findByTitle(new ResourceTitleDTO(title));
+        ctx.status(200).json(resource);
+    }
+
+    //TODO: GET resource/{contributor}
+    public void getResourcesByContributor(Context ctx){
+        String contributorName = ctx.pathParam("name");
+        List<SimpleResourceDTO> resources = resourceService.findByContributor(new ContributorNameDTO(contributorName));
+        ctx.status(200).json(resources);
+    }
+
+    //TODO: GET resource/{keyword}
+    public void getResourcesByKeyword(Context ctx){
+        String keyword = ctx.pathParam("keyword");
+        List<SimpleResourceDTO> resources = resourceService.findByKeyword(new ResourceKeywordDTO(keyword));
+        ctx.status(200).json(resources);
     }
 
 

@@ -13,7 +13,7 @@ public class AdminRoutes {
     private static SecurityController securityController = SecurityController.getInstance();
 
 
-    public static EndpointGroup getSecuredRoutes() {
+    public EndpointGroup getSecuredRoutes() {
         return () -> {
             path("/protected", () -> {
                 get("/admin_demo", (ctx) -> ctx.json(jsonMapper.createObjectNode().put("msg", "Hello from ADMIN Protected")), Role.ADMIN);
