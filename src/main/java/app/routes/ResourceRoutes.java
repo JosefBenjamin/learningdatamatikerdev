@@ -19,7 +19,9 @@ public class ResourceRoutes {
 
         return () -> {
             path("/resources", () -> {
-                get(ctx -> resourceController.getAllResources(ctx), Role.ANYONE, Role.USER, Role.ADMIN);
+                get(ctx -> resourceController.getAllResources(ctx), Role.ANYONE);
+                get("/newest", ctx -> resourceController.getNewestResources(ctx), Role.ANYONE);
+                get("/updated", ctx -> resourceController.getRecentlyUpdatedResources(ctx), Role.ANYONE);
                 get("/id/{id}", ctx -> resourceController.getResourceById(ctx), Role.ANYONE);
                 get("/learning/{learning_id}", ctx -> resourceController.getResourceByLearningId(ctx), Role.ANYONE);
                 get("/format/{format_category}", ctx -> resourceController.getResourcesByFormatCategory(ctx), Role.USER, Role.ADMIN);
