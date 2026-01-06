@@ -109,10 +109,11 @@ public class ResourceDAO implements ICRUD<Resource> {
     // Get all resources sorted by newest first
     public List<Resource> retrieveSortAllNewest() {
         try(EntityManager em = emf.createEntityManager()){
-            TypedQuery<Resource> query = em.createQuery(
+            return em.createQuery(
                     "SELECT r FROM Resource r ORDER BY r.createdAt DESC",
-                    Resource.class);
-            return query.getResultList();
+                    Resource.class)
+                    .setMaxResults(100)
+                    .getResultList();
         }
     }
 

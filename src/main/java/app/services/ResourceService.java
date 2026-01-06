@@ -222,7 +222,7 @@ public class ResourceService {
     //UPDATE
 
     //TODO: PUT resources/{learning_id}
-    public SimpleResourceDTO updateResource(SimpleResourceDTO simpleResourceDTO, Long authenticatedContributorId){
+    public SimpleResourceDTO updateResource(SimpleResourceDTO simpleResourceDTO, boolean isAdmin, Long authenticatedContributorId){
         if(simpleResourceDTO == null || simpleResourceDTO.learningId() == null){
             throw new IllegalArgumentException("Learning id must be provided in order to update learning resource");
         }
@@ -257,7 +257,7 @@ public class ResourceService {
             resource.setDescription(simpleResourceDTO.description());
         }
 
-        if (!resource.getContributor().getId().equals(authenticatedContributorId)) {
+        if (!isAdmin && !resource.getContributor().getId().equals(authenticatedContributorId)) {
             throw new ApiException(403, "You are not allowed to update this resource");
         }
 

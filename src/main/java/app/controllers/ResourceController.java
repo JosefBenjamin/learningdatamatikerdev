@@ -164,10 +164,11 @@ public class ResourceController {
 
         // ) Extract user and authentication
         UserDTO userDTO = ctx.attribute("user");
-        Long authenticatedContributorId = contributorService.getContributorIdForUser(userDTO);
+        boolean isAdmin = userDTO.getRoles().contains("ADMIN");
+        Long authenticatedContributorId = isAdmin ? null : contributorService.getContributorIdForUser(userDTO);
 
         // 4) Call service
-        SimpleResourceDTO updatedSimpleResourceDTO = resourceService.updateResource(merged, authenticatedContributorId);
+        SimpleResourceDTO updatedSimpleResourceDTO = resourceService.updateResource(merged, isAdmin, authenticatedContributorId);
 
         // 5) Return status code and json
         ctx.status(200).json(updatedSimpleResourceDTO);
