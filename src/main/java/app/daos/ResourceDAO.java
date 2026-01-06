@@ -5,10 +5,7 @@ import app.enums.FormatCategory;
 import app.enums.SubCategory;
 import app.exceptions.ApiException;
 import app.exceptions.DatabaseException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -109,6 +106,26 @@ public class ResourceDAO implements ICRUD<Resource> {
         }
     }
 
+    // Get all resources sorted by newest first
+    public List<Resource> retrieveSortAllNewest() {
+        try(EntityManager em = emf.createEntityManager()){
+            TypedQuery<Resource> query = em.createQuery(
+                    "SELECT r FROM Resource r ORDER BY r.createdAt DESC",
+                    Resource.class);
+            return query.getResultList();
+        }
+    }
+
+    // Get resources modified recently (e.g., "Recently Updated")
+    public List<Resource> findRecentlyUpdated() {
+        try(EntityManager em = emf.createEntityManager()){
+            return em.createQuery(
+                            "SELECT r FROM Resource r ORDER BY r.modifiedAt DESC",
+                            Resource.class)
+                    .setMaxResults(100)
+                    .getResultList();
+        }
+    }
 
     @Override
     public Set<Resource> retrieveAll() {

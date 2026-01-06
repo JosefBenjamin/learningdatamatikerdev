@@ -65,13 +65,23 @@ public class ResourceController {
 
     //TODO: GET resources/  <-- retrieve all sort by format category
     public void getAllResources(Context ctx){
-        UserDTO user = ctx.attribute("user");
-        boolean isAdmin = user != null && user.getRoles().contains("ADMIN");
-        Long contributorId = contributorService.getContributorIdForUser(user);
-
-        List<ResourceDTO> response = resourceService.getAllResources(contributorId, isAdmin);
+        List<ResourceDTO> response = resourceService.getAllResources();
         ctx.status(200).json(response);
     }
+
+    //TODO: GET resources/newest
+    public void getNewestResources(Context ctx){
+        List<SimpleResourceDTO> response = resourceService.getNewestResources();
+        ctx.status(200).json(response);
+    }
+
+    //TODO: GET resources/newest
+    public void getRecentlyUpdatedResources(Context ctx){
+        List<SimpleResourceDTO> response = resourceService.getRecentlyUpdatedResources();
+        ctx.status(200).json(response);
+    }
+
+
 
     //TODO: GET resources/{format_category}
     public void getResourcesByFormatCategory(Context ctx){
@@ -147,7 +157,10 @@ public class ResourceController {
                 extractedResource.formatCategory(),
                 extractedResource.subCategory(),
                 extractedResource.description(),
-                extractedResource.simpleContributorDTO());
+                extractedResource.simpleContributorDTO(),
+                null,
+                null
+                );
 
         // ) Extract user and authentication
         UserDTO userDTO = ctx.attribute("user");

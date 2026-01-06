@@ -14,11 +14,13 @@ public class ConvertToResourceDTO implements IConverter<Resource, SimpleResource
         }
 
         Contributor contributor = source.getContributor();
+
         SimpleContributorDTO simpleContributorDTO = contributor == null ? null : new SimpleContributorDTO(
                 source.getContributor().getId(),
                 source.getContributor().getGithubProfile(),
                 source.getContributor().getScreenName(),
-                source.getContributor().getContributions());
+                source.getContributor().getContributions()
+        );
 
         return new SimpleResourceDTO(
                 source.getLearningId(),
@@ -27,7 +29,9 @@ public class ConvertToResourceDTO implements IConverter<Resource, SimpleResource
                 source.getFormatCategory(),
                 source.getSubCategory(),
                 source.getDescription(),
-                simpleContributorDTO
+                simpleContributorDTO,
+                source.getCreatedAt(),
+                source.getModifiedAt()
         );
     }
 

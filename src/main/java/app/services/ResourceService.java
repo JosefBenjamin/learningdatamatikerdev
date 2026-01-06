@@ -90,7 +90,10 @@ public class ResourceService {
                 persisted.getFormatCategory(),
                 persisted.getSubCategory(),
                 persisted.getDescription(),
-                contributorDTO);
+                contributorDTO,
+                persisted.getCreatedAt(),
+                persisted.getModifiedAt()
+                );
     }
 
 
@@ -125,11 +128,20 @@ public class ResourceService {
 
     //Getting all resources you must be logged in
     //TODO: GET resources/  <-- retrieve all sort by format category
-    public List<ResourceDTO> getAllResources(Long authenticatedContributorId, boolean isAdmin){
-        if (!isAdmin && authenticatedContributorId == null) {
-            throw new RuntimeException("You must be logged in to request all resources");
-        }
+    public List<ResourceDTO> getAllResources(){
         return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.retrieveAll()));
+    }
+
+    //TODO: GET resources/newest
+    public List<SimpleResourceDTO> getNewestResources() {
+        List<Resource> resources = RESOURCE_DAO.retrieveSortAllNewest();
+        return convertToResourceDTO.convertList(resources);
+    }
+
+    //TODO: GET resources/updated
+    public List<SimpleResourceDTO> getRecentlyUpdatedResources() {
+        List<Resource> resources = RESOURCE_DAO.findRecentlyUpdated();
+        return convertToResourceDTO.convertList(resources);
     }
 
     //Getting all resources by format cat you must be logged in
@@ -140,7 +152,7 @@ public class ResourceService {
         }
 
         if(singleFormatCatDTO == null || singleFormatCatDTO.formatCategory() == null){
-            return getAllResources(authenticatedContributorId, isAdmin);
+            return getAllResources();
         }
 
         return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.findByFormatCat(singleFormatCatDTO.formatCategory())));
@@ -154,7 +166,7 @@ public class ResourceService {
         }
 
         if(singleSubCategoryDTO == null || singleSubCategoryDTO.subCategory() == null){
-            return getAllResources(authenticatedContributorId, isAdmin);
+            return getAllResources();
         }
 
         return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.findBySubCat(singleSubCategoryDTO.subCategory())));
@@ -256,7 +268,8 @@ public class ResourceService {
 
         return new SimpleResourceDTO(updatedResource.getLearningId(), updatedResource.getLearningResourceLink(),
                 updatedResource.getTitle(), updatedResource.getFormatCategory(), updatedResource.getSubCategory(),
-                updatedResource.getDescription(),simpleContributorDTO);
+                updatedResource.getDescription(),simpleContributorDTO,
+                updatedResource.getCreatedAt(), updatedResource.getModifiedAt());
     }
 
 
