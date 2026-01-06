@@ -41,8 +41,9 @@ public class ContributorDAO {
     public List<Contributor> retrieveAll() {
         try(EntityManager em = emf.createEntityManager()){
             TypedQuery<Contributor> entities = em.createQuery(
-                    "SELECT c " +
+                    "SELECT DISTINCT c " +
                             "FROM Contributor c " +
+                            "LEFT JOIN FETCH c.resources " +
                             "ORDER BY COALESCE(c.githubProfile, c.screenName) " +
                             "DESC ",
                     Contributor.class);
@@ -55,8 +56,9 @@ public class ContributorDAO {
     public List<Contributor> findByMostContributions(){
         try(EntityManager em = emf.createEntityManager()){
             TypedQuery<Contributor> entities = em.createQuery(
-                    "SELECT c " +
+                    "SELECT DISTINCT c " +
                             "FROM Contributor c " +
+                            "LEFT JOIN FETCH c.resources " +
                             "ORDER BY c.contributions DESC ", Contributor.class);
 
             //Must use List instead of Set because list preserves order integrity
