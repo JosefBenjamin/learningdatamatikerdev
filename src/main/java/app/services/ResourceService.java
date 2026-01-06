@@ -227,7 +227,7 @@ public class ResourceService {
             throw new IllegalArgumentException("Learning id must be provided in order to update learning resource");
         }
 
-        if(authenticatedContributorId == null){
+        if(!isAdmin && authenticatedContributorId == null){
             throw new ApiException(403, "You must have a contributor profile to create resources");
         }
 
