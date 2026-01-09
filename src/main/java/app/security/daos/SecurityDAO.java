@@ -92,24 +92,31 @@ public class SecurityDAO implements ISecurityDAO {
             String github = blankToNull(dto.githubProfile());
             String screenName = blankToNull(dto.screenName());
 
-            //if one of these isn't null the try block is executed
-            if (github != null || screenName != null) {
+            // Check for duplicates only if values are provided
+            if (github != null) {
                 try {
                     em.createQuery(
-                                    "SELECT c FROM Contributor c " +
-                                            "WHERE (:github IS NOT NULL AND LOWER(c.githubProfile) = LOWER(:github)) " +
-                                            "OR (:screen IS NOT NULL AND LOWER(c.screenName) = LOWER(:screen))",
+                                    "SELECT c FROM Contributor c WHERE LOWER(c.githubProfile) = LOWER(:github)",
                                     Contributor.class)
                             .setParameter("github", github)
-                            .setParameter("screen", screenName)
                             .getSingleResult();
-
-                    throw new EntityExistsException("GitHub handle or screen name already exists");
+                    throw new EntityExistsException("GitHub handle already exists");
                 } catch (NoResultException ignored) {
-                    // No duplicates found, continue
+                    // No duplicate found
                 }
             }
 
+            if (screenName != null) {
+                try {
+                    em.createQuery("SELECT c FROM Contributor c WHERE LOWER(c.screenName) = LOWER(:screen)",
+                                    Contributor.class)
+                            .setParameter("screen", screenName)
+                            .getSingleResult();
+                    throw new EntityExistsException("Screen name already exists");
+                } catch (NoResultException ignored) {
+                    // No duplicate found
+                }
+            }
             EntityTransaction tx = em.getTransaction();
             try {
                 tx.begin();
