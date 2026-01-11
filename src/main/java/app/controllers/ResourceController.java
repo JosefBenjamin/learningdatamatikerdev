@@ -172,6 +172,8 @@ public class ResourceController {
                 extractedResource.description(),
                 extractedResource.simpleContributorDTO(),
                 null,
+                null,
+                null,
                 null
                 );
 
