@@ -2,6 +2,7 @@ package app.configs;
 
 import app.entities.Contributor;
 import app.entities.Resource;
+import app.entities.UserLike;
 import app.security.entities.Role;
 import app.security.entities.User;
 import app.utils.Utils;
@@ -57,6 +58,7 @@ public class HibernateConfig {
         configuration.addAnnotatedClass(Contributor.class);
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Role.class);
+        configuration.addAnnotatedClass(UserLike.class);
     }
 
     private static EntityManagerFactory createEMF(boolean forTest) {
@@ -91,7 +93,7 @@ public class HibernateConfig {
     private static Properties setBaseProperties(Properties props) {
         props.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         props.put("hibernate.connection.driver_class", "org.postgresql.Driver");
-        props.put("hibernate.hbm2ddl.auto", "create");
+        props.put("hibernate.hbm2ddl.auto", "update"); // update for production
         props.put("hibernate.current_session_context_class", "thread");
         props.put("hibernate.show_sql", "true");
         props.put("hibernate.format_sql", "true");
@@ -123,7 +125,7 @@ public class HibernateConfig {
         props.put("hibernate.connection.password", "postgres");
         props.put("hibernate.archive.autodetection", "class");
         props.put("hibernate.show_sql", "true");
-        props.put("hibernate.hbm2ddl.auto", "update"); // update for production
+        props.put("hibernate.hbm2ddl.auto", "update");
         return props;
     }
 }

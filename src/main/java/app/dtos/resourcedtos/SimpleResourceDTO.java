@@ -15,6 +15,8 @@ public record SimpleResourceDTO(
         String description,
         SimpleContributorDTO simpleContributorDTO,
         LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+        LocalDateTime modifiedAt,
+        Integer likeCount,
+        Boolean isLikedByCurrentUser
 ) {
 }

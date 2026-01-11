@@ -32,6 +32,8 @@ public class ResourceRoutes {
                 post(ctx -> resourceController.createResource(ctx), Role.USER, Role.ADMIN);
                 put("/{learning_id}", ctx -> resourceController.updateResource(ctx), Role.USER, Role.ADMIN);
                 delete("/{learning_id}", ctx -> resourceController.deleteResource(ctx), Role.USER, Role.ADMIN);
+                post("/{id}/like", ctx -> resourceController.likeResource(ctx), Role.USER, Role.ADMIN);
+                delete("/{id}/like", ctx -> resourceController.unlikeResource(ctx), Role.USER, Role.ADMIN);
             });
         };
     }

@@ -139,6 +139,23 @@ public class ResourceDAO implements ICRUD<Resource> {
         }
     }
 
+    public List<Resource> retrieveAllPaginated(int page, int limit) {
+        try(EntityManager em = emf.createEntityManager()){
+            return em.createQuery(
+                    "SELECT r FROM Resource r ORDER BY r.createdAt DESC", Resource.class)
+                    .setFirstResult(page * limit)
+                    .setMaxResults(limit)
+                    .getResultList();
+        }
+    }
+
+    public long countAll() {
+        try(EntityManager em = emf.createEntityManager()){
+            return em.createQuery("SELECT COUNT(r) FROM Resource r", Long.class)
+                    .getSingleResult();
+        }
+    }
+
 
     public List<Resource> findByFormatCat(FormatCategory formatCategory) {
         if (formatCategory == null) {
