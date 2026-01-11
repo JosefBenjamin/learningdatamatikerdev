@@ -4,7 +4,6 @@ import app.dtos.categorydtos.SingleFormatCatDTO;
 import app.dtos.categorydtos.SingleSubCategoryDTO;
 import app.dtos.contributordtos.ContributorNameDTO;
 import app.dtos.resourcedtos.LearningIdDTO;
-import app.dtos.resourcedtos.ResourceDTO;
 import app.dtos.resourcedtos.ResourceIdDTO;
 import app.dtos.resourcedtos.ResourceKeywordDTO;
 import app.dtos.resourcedtos.ResourceTitleDTO;
@@ -65,7 +64,7 @@ public class ResourceController {
 
     //TODO: GET resources/  <-- retrieve all sort by format category
     public void getAllResources(Context ctx){
-        List<ResourceDTO> response = resourceService.getAllResources();
+        List<SimpleResourceDTO> response = resourceService.getAllResources();
         ctx.status(200).json(response);
     }
 
@@ -92,7 +91,7 @@ public class ResourceController {
         boolean isAdmin = user != null && user.getRoles().contains("ADMIN");
         Long contributorId = contributorService.getContributorIdForUser(user);
 
-        List<ResourceDTO> response = resourceService.getAllResourcesInFormatCat(
+        List<SimpleResourceDTO> response = resourceService.getAllResourcesInFormatCat(
                 new SingleFormatCatDTO(formatCategory),
                 contributorId,
                 isAdmin);
@@ -108,7 +107,7 @@ public class ResourceController {
         boolean isAdmin = user != null && user.getRoles().contains("ADMIN");
         Long contributorId = contributorService.getContributorIdForUser(user);
 
-        List<ResourceDTO> response = resourceService.getAllResourcesInSubCat(
+        List<SimpleResourceDTO> response = resourceService.getAllResourcesInSubCat(
                 new SingleSubCategoryDTO(subCategory),
                 contributorId,
                 isAdmin);

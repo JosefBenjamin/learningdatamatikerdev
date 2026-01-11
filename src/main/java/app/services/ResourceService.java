@@ -128,8 +128,8 @@ public class ResourceService {
 
     //Getting all resources you must be logged in
     //TODO: GET resources/  <-- retrieve all sort by format category
-    public List<ResourceDTO> getAllResources(){
-        return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.retrieveAll()));
+    public List<SimpleResourceDTO> getAllResources(){
+        return new ArrayList<>(convertToResourceDTO.convertList(RESOURCE_DAO.retrieveAll()));
     }
 
     //TODO: GET resources/newest
@@ -146,7 +146,7 @@ public class ResourceService {
 
     //Getting all resources by format cat you must be logged in
     //TODO: GET resources/{format_category}
-    public List<ResourceDTO> getAllResourcesInFormatCat(SingleFormatCatDTO singleFormatCatDTO, Long authenticatedContributorId, boolean isAdmin){
+    public List<SimpleResourceDTO> getAllResourcesInFormatCat(SingleFormatCatDTO singleFormatCatDTO, Long authenticatedContributorId, boolean isAdmin){
         if (!isAdmin && authenticatedContributorId == null) {
             throw new RuntimeException("You must be logged in to request all resources in a category");
         }
@@ -155,12 +155,12 @@ public class ResourceService {
             return getAllResources();
         }
 
-        return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.findByFormatCat(singleFormatCatDTO.formatCategory())));
+        return new ArrayList<>(convertToResourceDTO.convertList(RESOURCE_DAO.findByFormatCat(singleFormatCatDTO.formatCategory())));
     }
 
     //Getting all resources by sub cat you must be logged in
     //TODO: GET resources/{sub_category}
-    public List<ResourceDTO> getAllResourcesInSubCat(SingleSubCategoryDTO singleSubCategoryDTO, Long authenticatedContributorId, boolean isAdmin){
+    public List<SimpleResourceDTO> getAllResourcesInSubCat(SingleSubCategoryDTO singleSubCategoryDTO, Long authenticatedContributorId, boolean isAdmin){
         if (!isAdmin && authenticatedContributorId == null) {
             throw new RuntimeException("You must be logged in to request all resources in a category");
         }
@@ -169,7 +169,7 @@ public class ResourceService {
             return getAllResources();
         }
 
-        return new ArrayList<>(resourceToResourceDTO.convertList(RESOURCE_DAO.findBySubCat(singleSubCategoryDTO.subCategory())));
+        return new ArrayList<>(convertToResourceDTO.convertList(RESOURCE_DAO.findBySubCat(singleSubCategoryDTO.subCategory())));
     }
 
 
