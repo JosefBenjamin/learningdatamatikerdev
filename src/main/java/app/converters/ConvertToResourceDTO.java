@@ -5,10 +5,16 @@ import app.dtos.resourcedtos.SimpleResourceDTO;
 import app.entities.Contributor;
 import app.entities.Resource;
 
+import java.util.List;
+
 public class ConvertToResourceDTO implements IConverter<Resource, SimpleResourceDTO> {
 
     @Override
     public SimpleResourceDTO convert(Resource source) {
+        return convert(source, 0, null);
+    }
+
+    public SimpleResourceDTO convert(Resource source, int likeCount, Boolean isLikedByCurrentUser) {
         if (source == null) {
             return null;
         }
@@ -31,17 +37,19 @@ public class ConvertToResourceDTO implements IConverter<Resource, SimpleResource
                 source.getDescription(),
                 simpleContributorDTO,
                 source.getCreatedAt(),
-                source.getModifiedAt()
+                source.getModifiedAt(),
+                likeCount,
+                isLikedByCurrentUser
         );
     }
 
-    /**
-     *         Integer learningId,
-     *         String learningResourceLink,
-     *         String title,
-     *         FormatCategory formatCategory,
-     *         SubCategory subCategory,
-     *         String description,
-     *         SimpleContributorDTO simpleContributorDTO
-     */
+    @Override
+    public List<SimpleResourceDTO> convertList(List<Resource> sources) {
+        if (sources == null) {
+            return null;
+        }
+        return sources.stream()
+                .map(this::convert)
+                .toList();
+    }
 }

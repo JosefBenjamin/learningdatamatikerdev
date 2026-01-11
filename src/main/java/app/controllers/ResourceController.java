@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.dtos.PageDTO;
 import app.dtos.categorydtos.SingleFormatCatDTO;
 import app.dtos.categorydtos.SingleSubCategoryDTO;
 import app.dtos.contributordtos.ContributorNameDTO;
@@ -51,7 +52,9 @@ public class ResourceController {
     //TODO: GET resources/{id}
     public void getResourceById(Context ctx){
         Long id = Long.valueOf(ctx.pathParam("id"));
-        SimpleResourceDTO resource = resourceService.findResourceById(new ResourceIdDTO(id));
+        UserDTO userDTO = ctx.attribute("user");
+        String username = userDTO != null ? userDTO.getUsername() : null;
+        SimpleResourceDTO resource = resourceService.findResourceByIdWithLikes(id, username);
         ctx.status(200).json(resource);
     }
 
@@ -62,10 +65,21 @@ public class ResourceController {
         ctx.status(200).json(resource);
     }
 
-    //TODO: GET resources/  <-- retrieve all sort by format category
+    //TODO: GET resources/  <-- retrieve all, supports pagination with ?page=0&limit=20
     public void getAllResources(Context ctx){
-        List<SimpleResourceDTO> response = resourceService.getAllResources();
-        ctx.status(200).json(response);
+        String pageParam = ctx.queryParam("page");
+        String limitParam = ctx.queryParam("limit");
+
+        if (pageParam != null && limitParam != null) {
+            int page = Integer.parseInt(pageParam);
+            int limit = Integer.parseInt(limitParam);
+            limit = Math.min(limit, 100); // Cap at 100 to prevent abuse
+            PageDTO<SimpleResourceDTO> response = resourceService.getAllResourcesPaginated(page, limit);
+            ctx.status(200).json(response);
+        } else {
+            List<SimpleResourceDTO> response = resourceService.getAllResources();
+            ctx.status(200).json(response);
+        }
     }
 
     //TODO: GET resources/newest
@@ -194,5 +208,24 @@ public class ResourceController {
     }
 
 
+    //TODO: POST resources/{id}/like
+    public void likeResource(Context ctx) {
+        Long id = Long.valueOf(ctx.pathParam("id"));
+        UserDTO userDTO = ctx.attribute("user");
+        String username = userDTO != null ? userDTO.getUsername() : null;
+
+        resourceService.likeResource(id, username);
+        ctx.status(201).json(Map.of("liked", true));
+    }
+
+    //TODO: DELETE resources/{id}/like
+    public void unlikeResource(Context ctx) {
+        Long id = Long.valueOf(ctx.pathParam("id"));
+        UserDTO userDTO = ctx.attribute("user");
+        String username = userDTO != null ? userDTO.getUsername() : null;
+
+        boolean removed = resourceService.unlikeResource(id, username);
+        ctx.status(200).json(Map.of("unliked", removed));
+    }
 
 }

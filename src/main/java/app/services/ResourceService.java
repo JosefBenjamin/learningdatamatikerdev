@@ -5,8 +5,10 @@ import app.converters.ConvertToResourceDTO;
 import app.converters.ResourceToResourceDTO;
 import app.daos.ContributorDAO;
 import app.daos.ResourceDAO;
+import app.daos.UserLikeDAO;
 import app.dtos.categorydtos.SingleFormatCatDTO;
 import app.dtos.categorydtos.SingleSubCategoryDTO;
+import app.dtos.PageDTO;
 import app.dtos.contributordtos.ContributorNameDTO;
 import app.dtos.contributordtos.SimpleContributorDTO;
 import app.dtos.resourcedtos.*;
@@ -23,6 +25,7 @@ public class ResourceService {
     private final EntityManagerFactory EMF = HibernateConfig.getEntityManagerFactory();
     private final ContributorDAO CONTRIBUTOR_DAO = ContributorDAO.getInstance(EMF);
     private final ResourceDAO RESOURCE_DAO = ResourceDAO.getInstance(EMF);
+    private final UserLikeDAO USER_LIKE_DAO = UserLikeDAO.getInstance(EMF);
     private final ConvertToResourceDTO convertToResourceDTO = new ConvertToResourceDTO();
     private final ResourceToResourceDTO resourceToResourceDTO = new ResourceToResourceDTO();
 
@@ -92,7 +95,9 @@ public class ResourceService {
                 persisted.getDescription(),
                 contributorDTO,
                 persisted.getCreatedAt(),
-                persisted.getModifiedAt()
+                persisted.getModifiedAt(),
+                0,
+                null
                 );
     }
 
@@ -130,6 +135,14 @@ public class ResourceService {
     //TODO: GET resources/  <-- retrieve all sort by format category
     public List<SimpleResourceDTO> getAllResources(){
         return new ArrayList<>(convertToResourceDTO.convertList(RESOURCE_DAO.retrieveAll()));
+    }
+
+    //TODO: GET resources?page=0&limit=20
+    public PageDTO<SimpleResourceDTO> getAllResourcesPaginated(int page, int limit){
+        List<Resource> resources = RESOURCE_DAO.retrieveAllPaginated(page, limit);
+        long totalElements = RESOURCE_DAO.countAll();
+        List<SimpleResourceDTO> content = convertToResourceDTO.convertList(resources);
+        return PageDTO.of(content, page, limit, totalElements);
     }
 
     //TODO: GET resources/newest
@@ -266,10 +279,12 @@ public class ResourceService {
         SimpleContributorDTO simpleContributorDTO = new SimpleContributorDTO(updatedResource.getContributor().getId(), updatedResource.getContributor().getGithubProfile(),
                 updatedResource.getContributor().getScreenName(), updatedResource.getContributor().getContributions());
 
+        int likeCount = USER_LIKE_DAO.getLikeCount(updatedResource.getId());
         return new SimpleResourceDTO(updatedResource.getLearningId(), updatedResource.getLearningResourceLink(),
                 updatedResource.getTitle(), updatedResource.getFormatCategory(), updatedResource.getSubCategory(),
-                updatedResource.getDescription(),simpleContributorDTO,
-                updatedResource.getCreatedAt(), updatedResource.getModifiedAt());
+                updatedResource.getDescription(), simpleContributorDTO,
+                updatedResource.getCreatedAt(), updatedResource.getModifiedAt(),
+                likeCount, null);
     }
 
 
@@ -307,4 +322,37 @@ public class ResourceService {
     }
 
 
+    //LIKES
+
+    public void likeResource(Long resourceId, String username) {
+        if (resourceId == null) {
+            throw new IllegalArgumentException("Resource ID is required");
+        }
+        if (username == null || username.isBlank()) {
+            throw new ApiException(403, "You must be logged in to like a resource");
+        }
+        USER_LIKE_DAO.addLike(username, resourceId);
+    }
+
+    public boolean unlikeResource(Long resourceId, String username) {
+        if (resourceId == null) {
+            throw new IllegalArgumentException("Resource ID is required");
+        }
+        if (username == null || username.isBlank()) {
+            throw new ApiException(403, "You must be logged in to unlike a resource");
+        }
+        return USER_LIKE_DAO.removeLike(username, resourceId);
+    }
+
+    public SimpleResourceDTO findResourceByIdWithLikes(Long resourceId, String username) {
+        Resource resource = RESOURCE_DAO.findById(resourceId);
+        if (resource == null) {
+            throw new EntityNotFoundException("Could not find a resource with that id");
+        }
+
+        int likeCount = USER_LIKE_DAO.getLikeCount(resourceId);
+        Boolean isLikedByCurrentUser = username != null ? USER_LIKE_DAO.userLikesResource(username, resourceId) : null;
+
+        return convertToResourceDTO.convert(resource, likeCount, isLikedByCurrentUser);
+    }
 }
