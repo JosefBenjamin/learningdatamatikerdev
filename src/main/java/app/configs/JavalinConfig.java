@@ -53,18 +53,15 @@ public class JavalinConfig {
      */
 
 
-    //corsHeaders: used on normal requests to ensure the response includes proper CORS permissions.
     private static void corsHeaders(Context ctx) {
-        ctx.header("Access-Control-Allow-Origin", "*");
+        ctx.header("Access-Control-Allow-Origin", "https://learn.datamatiker.dev");
         ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
         ctx.header("Access-Control-Allow-Credentials", "true");
     }
 
-    //corsHeadersOptions: used specifically for preflight requests to say:
-    // “yes, this cross-origin call is allowed,” with an empty 204 response.
     private static void corsHeadersOptions(Context ctx) {
-        ctx.header("Access-Control-Allow-Origin", "*");
+        ctx.header("Access-Control-Allow-Origin", "https://learn.datamatiker.dev");
         ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
         ctx.header("Access-Control-Allow-Credentials", "true");
