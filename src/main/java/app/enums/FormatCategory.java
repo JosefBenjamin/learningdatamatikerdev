@@ -1,17 +1,12 @@
 package app.enums;
 
 public enum FormatCategory {
-    BOOK,
-    COURSE,
-    DOCUMENT,
-    GAME,
-    IMAGE,
-    MAGAZINE,
-    MOVIE,
-    MUSIC,
+    PDF,
+    YOUTUBE,
+    ARTICLE,
+    EBOOK,
     PODCAST,
-    SERIES,
-    SOFTWARE,
-    VIDEO,
-    QUOTE
+    GAME,
+    BLOGPOST,
+    OTHER
 }
