@@ -29,6 +29,9 @@ public class ContributorService {
             return null;
         }
         Contributor contributor = CONTRIBUTOR_DAO.findByUsername(user.getUsername());
+        if (contributor == null) {
+            return null;
+        }
         return contributor.getId();
     }
 
@@ -41,11 +44,10 @@ public class ContributorService {
 
         for(Contributor c : CONTRIBUTOR_DAO.retrieveAll()){
             ProfileDTO x = convertToContributeDTO.convert(c);
-            if(x.githubProfile() == null){
-                screeNameList.add(new ScreenNameProfileDTO(x.screenName(), x.contributions(), x.resources()));
-            }
-            if(x.screenName() == null){
+            if(x.githubProfile() != null && !x.githubProfile().isBlank()){
                 githubList.add(new GithubProfileDTO(x.githubProfile(), x.contributions(), x.resources()));
+            } else if(x.screenName() != null && !x.screenName().isBlank()){
+                screeNameList.add(new ScreenNameProfileDTO(x.screenName(), x.contributions(), x.resources()));
             }
         }
         return new GitHubScreenNameListsDTO(githubList, screeNameList);
@@ -58,11 +60,10 @@ public class ContributorService {
 
         for(Contributor c : CONTRIBUTOR_DAO.findByMostContributions()){
             ProfileDTO x = convertToContributeDTO.convert(c);
-            if(x.githubProfile() == null){
-                screeNameList.add(new ScreenNameProfileDTO(x.screenName(), x.contributions(), x.resources()));
-            }
-            if(x.screenName() == null){
+            if(x.githubProfile() != null && !x.githubProfile().isBlank()){
                 githubList.add(new GithubProfileDTO(x.githubProfile(), x.contributions(), x.resources()));
+            } else if(x.screenName() != null && !x.screenName().isBlank()){
+                screeNameList.add(new ScreenNameProfileDTO(x.screenName(), x.contributions(), x.resources()));
             }
         }
         return new GitHubScreenNameListsDTO(githubList, screeNameList);

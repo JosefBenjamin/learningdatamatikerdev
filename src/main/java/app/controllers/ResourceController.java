@@ -179,7 +179,7 @@ public class ResourceController {
 
         // ) Extract user and authentication
         UserDTO userDTO = ctx.attribute("user");
-        boolean isAdmin = userDTO.getRoles().contains("ADMIN");
+        boolean isAdmin = userDTO != null && userDTO.getRoles().contains("ADMIN");
         Long authenticatedContributorId = isAdmin ? null : contributorService.getContributorIdForUser(userDTO);
 
         // 4) Call service
@@ -198,7 +198,7 @@ public class ResourceController {
 
         // 2) Extract authenticated user context (from security middleware)
         UserDTO userDTO = ctx.attribute("user");
-        boolean isAdmin = userDTO.getRoles().contains("ADMIN");
+        boolean isAdmin = userDTO != null && userDTO.getRoles().contains("ADMIN");
         Long authenticatedContributorId = isAdmin ? null : contributorService.getContributorIdForUser(userDTO);
 
         // 3) Call the service method

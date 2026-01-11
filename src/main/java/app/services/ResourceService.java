@@ -245,7 +245,7 @@ public class ResourceService {
         }
 
         Resource resource = RESOURCE_DAO.findByLearningId(simpleResourceDTO.learningId());
-        if(RESOURCE_DAO.findById(resource.getId()) == null){
+        if(resource == null){
             throw new ApiException(404, "Couldn't find the learning resource in our database");
         }
 

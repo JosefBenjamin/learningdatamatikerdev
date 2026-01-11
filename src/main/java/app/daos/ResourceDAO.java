@@ -8,6 +8,7 @@ import app.exceptions.DatabaseException;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -135,7 +136,7 @@ public class ResourceDAO implements ICRUD<Resource> {
             "SELECT r " +
                     "FROM Resource r " +
                     "ORDER BY r.formatCategory DESC ", Resource.class);
-            return new HashSet<>(entities.getResultList());
+            return new LinkedHashSet<>(entities.getResultList());
         }
     }
 
@@ -221,7 +222,7 @@ public class ResourceDAO implements ICRUD<Resource> {
                                     "WHERE r.contributor.id = :contributor_id", Resource.class)
                     .setParameter("contributor_id", id);
 
-            return new HashSet<>(entities.getResultList());
+            return new LinkedHashSet<>(entities.getResultList());
         }
     }
 
@@ -238,7 +239,7 @@ public class ResourceDAO implements ICRUD<Resource> {
                             Resource.class)
                     .setParameter("pattern", pattern);
 
-            return new HashSet<>(entities.getResultList());
+            return new LinkedHashSet<>(entities.getResultList());
         }
     }
 

@@ -23,6 +23,9 @@ public class Contributor {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Version
+    private Long version;
+
     private String githubProfile;
 
     private String screenName;

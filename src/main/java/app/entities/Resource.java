@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "resource")
@@ -54,6 +56,11 @@ public class Resource {
     @JoinColumn(name = "contributor_id", nullable = false)
     @ToString.Exclude
     private Contributor contributor;
+
+    @OneToMany(mappedBy = "resource", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private Set<UserLike> likes = new HashSet<>();
 
 
     public Resource(Integer learningId, String learningResourceLink, FormatCategory formatCategory, SubCategory subCategory, String description, Contributor contributor) {

@@ -88,7 +88,7 @@ public class ContributorDAO {
 
     public Contributor findByUsername(String username){
         if(username == null || username.isBlank()){
-            throw new IllegalArgumentException("You must insert a valid username for the " + ENTITY_NAME + " entity");
+            return null;
         }
         String normalized = username.trim().toLowerCase();
         try(EntityManager em = emf.createEntityManager()){
@@ -100,7 +100,7 @@ public class ContributorDAO {
                         .setParameter("value", normalized)
                         .getSingleResult();
             } catch (NoResultException e) {
-                throw new EntityNotFoundException("Could not find a user with that username in the " + ENTITY_NAME + " entity");
+                return null;
             }
         }
     }
