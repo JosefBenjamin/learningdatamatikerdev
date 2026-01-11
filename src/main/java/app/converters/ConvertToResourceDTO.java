@@ -5,8 +5,6 @@ import app.dtos.resourcedtos.SimpleResourceDTO;
 import app.entities.Contributor;
 import app.entities.Resource;
 
-import java.util.List;
-
 public class ConvertToResourceDTO implements IConverter<Resource, SimpleResourceDTO> {
 
     @Override
@@ -43,13 +41,4 @@ public class ConvertToResourceDTO implements IConverter<Resource, SimpleResource
         );
     }
 
-    @Override
-    public List<SimpleResourceDTO> convertList(List<Resource> sources) {
-        if (sources == null) {
-            return null;
-        }
-        return sources.stream()
-                .map(this::convert)
-                .toList();
-    }
 }
