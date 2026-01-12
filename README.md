@@ -23,6 +23,63 @@ Authorization: Bearer <your_token>
 
 ---
 
+## Database Schema (ERD)
+
+```mermaid
+erDiagram
+    users ||--o{ user_roles : has
+    roles ||--o{ user_roles : has
+    users ||--|| contributor : has
+    contributor ||--o{ resource : creates
+    users ||--o{ user_likes : gives
+    resource ||--o{ user_likes : receives
+
+    users {
+        varchar username PK
+        varchar password
+    }
+
+    roles {
+        varchar name PK
+    }
+
+    user_roles {
+        varchar user_id FK
+        varchar role_name FK
+    }
+
+    contributor {
+        bigint id PK
+        bigint version
+        varchar github_profile
+        varchar screen_name
+        int contributions
+        varchar user_username FK, UK
+    }
+
+    resource {
+        bigint id PK
+        int learning_id UK
+        varchar learning_resource_link
+        varchar title
+        varchar format_category
+        varchar sub_category
+        varchar description
+        timestamp created_at
+        timestamp modified_at
+        bigint contributor_id FK
+    }
+
+    user_likes {
+        bigint id PK
+        varchar user_username FK
+        bigint resource_id FK
+        timestamp created_at
+    }
+```
+
+---
+
 ## Authentication Endpoints
 
 ### Health Check
